@@ -11,6 +11,7 @@
   const sendArticle=()=>frame.contentWindow?.postMessage({type:'blog-route',article},'*');
   function pageRoute(link){return link?.getAttribute('href')||'#side-quests';}
   let phase='closed',generation=0,finishTimer=0,instant=false;
+  let waitForBlogReady=false;
   const setPhase=value=>{phase=value;page.dataset.phase=value;};
   const wakeGalaxy=()=>{window.portfolioSideQuestsOpen=false;window.dispatchEvent(new Event('inner-world-galaxy-wake'));};
   function finishClose(){
@@ -47,6 +48,7 @@
     if(phase==='leaving')finishClose();
     const documentSource=next==='blog'?document.getElementById('blog-document'):payload;
     const token=++generation;instant=Boolean(options.instant||motion?.matches);
+    waitForBlogReady=next==='blog';
     savedFocus=document.activeElement;previousOverflow=document.body.style.overflow;previousPadding=document.body.style.paddingRight;
     paused=[...document.body.children].filter(node=>node!==page&&!['SCRIPT','STYLE'].includes(node.tagName)).map(node=>[node,node.inert]);
     for(const [node] of paused)node.inert=true;
@@ -71,6 +73,8 @@
         html=JSON.parse(documentSource.textContent);
       }
     }catch{
+      if(token!==generation)return;
+      waitForBlogReady=false;
       html='<!doctype html><html><head><meta charset="utf-8"></head><body><p>This page could not be loaded.</p><button type="button" onclick="parent.postMessage({type:\'portfolio-sidequests-return\'},\'*\')">Return to portfolio</button></body></html>';
     }
     if(token!==generation||phase!=='loading')return;
@@ -78,14 +82,16 @@
     frame.srcdoc=html.replace('</head>',bootstrap+embedded+'</head>');
     requestAnimationFrame(()=>requestAnimationFrame(()=>{if(token===generation&&phase==='loading')page.classList.add('is-loading');}));
   }
+  function revealWhenPaintable(token,child,section){
+    Promise.race([child?.fonts?.ready||Promise.resolve(),new Promise(resolve=>setTimeout(resolve,900))])
+      .catch(()=>{}).then(()=>requestAnimationFrame(()=>requestAnimationFrame(()=>{
+        if(section===undefined||section===article)reveal(token);
+      })));
+  }
   frame.addEventListener('load',()=>{
-    const token=generation;if(phase!=='loading')return;
-    try{
-      const child=frame.contentDocument;
-      if(Number(child?.documentElement?.dataset.questToken)!==token)return;
-      Promise.race([child.fonts?.ready||Promise.resolve(),new Promise(resolve=>setTimeout(resolve,900))])
-        .catch(()=>{}).then(()=>requestAnimationFrame(()=>requestAnimationFrame(()=>reveal(token))));
-    }catch{/* The child's ready message also works in opaque file origins. */}
+    if(phase!=='loading'||waitForBlogReady)return;
+    const child=frame.contentDocument;
+    if(Number(child?.documentElement?.dataset.questToken)===generation)revealWhenPaintable(generation,child);
   });
   function hide(options={}){
     if(phase==='closed'||phase==='leaving')return;
@@ -147,6 +153,12 @@
   window.addEventListener('hashchange',route);window.addEventListener('popstate',route);
   window.addEventListener('message',event=>{
     if(event.source!==frame.contentWindow)return;
+    if(event.data?.type==='blog-route-ready'){
+      if(!waitForBlogReady||phase!=='loading'||event.data.token!==generation)return;
+      if(event.data.section!==article){sendArticle();return;}
+      revealWhenPaintable(generation,frame.contentDocument,event.data.section);
+      return;
+    }
     if(currentPage==='blog'&&event.data?.type==='blog-navigate'){
       const id=event.data.article;if(typeof id!=='string'||!/^[a-z0-9-]+$/.test(id))return;
       const hash=id==='home'?'#blog':'#blog/'+id;
@@ -154,7 +166,7 @@
       article=id;sendArticle();return;
     }
     if(event.data?.type==='portfolio-sidequests-return')window.closeSideQuestsPage({instant:event.data.instant});
-    if(event.data?.type==='portfolio-sidequests-ready')reveal(event.data.token);
+    if(event.data?.type==='portfolio-sidequests-ready'&&!waitForBlogReady)reveal(event.data.token);
   });
   document.addEventListener('keydown',event=>{
     if(event.key==='Escape'&&!page.hidden){event.preventDefault();window.closeSideQuestsPage({instant:true});}

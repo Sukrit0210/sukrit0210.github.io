@@ -1978,11 +1978,10 @@
   });
   document.getElementById('model-return').addEventListener('click',reopen);
   document.querySelectorAll('[data-replay]').forEach(link=>link.addEventListener('click',event=>{event.preventDefault();location.reload();}));
-  document.querySelectorAll('[data-model]').forEach(link=>link.addEventListener('click',event=>{event.preventDefault();enterModel();}));
   // Explicit navigation can leave the reel without trapping the full site's links.
   document.getElementById('reel-skip-btn')?.addEventListener('click',skipIntro);
   document.querySelector('.skip-link')?.addEventListener('click',finish);
-  introHeader?.querySelector('a[href="#contact"]')?.addEventListener('click',finish);
+  introHeader?.querySelectorAll('a[href="#about"],a[href="#contact"]').forEach(link=>link.addEventListener('click',finish));
   window.addEventListener('resize',measure,{passive:true});
   document.fonts?.ready.then(measureLabels);
   document.addEventListener('visibilitychange',requestFrame);
