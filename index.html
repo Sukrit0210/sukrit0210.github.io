@@ -3,8 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-  <meta name="description" content="Sukrit Ghosh — Portfolio in Statistics, Computational Machine Learning, Time Series, and Probabilistic Systems.">
-  <title>Sukrit Ghosh · Portfolio V7.17</title>
+  <meta name="description" content="A home for my research, writing, projects, and side quests.">
+  <title>Sukrit Ghosh · Mind of Mine</title>
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Sukrit Ghosh · Mind of Mine">
+  <meta property="og:description" content="A home for my research, writing, projects, and side quests.">
+  <meta property="og:url" content="https://sukrit0210.github.io/">
   <meta name="version" content="0.7.17">
   <style>
     /* Offline font: Geist Sans, Google Fonts / Vercel.
@@ -2266,12 +2270,12 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
         color: var(--accent);
         margin-bottom: 12px !important;
       }
-      .project-stack .card-meta span:last-child {
+      .project-stack .card-meta span + span {
         color: var(--muted);
         position: relative;
         padding-left: 14px;
       }
-      .project-stack .card-meta span:last-child::before {
+      .project-stack .card-meta span + span::before {
         content: "/";
         position: absolute;
         left: 0;
@@ -3428,8 +3432,11 @@ Gloria Hallelujah: Kimberly Geswein / SIL OFL; full license bundled in fonts/. *
 }
 #project-grid.reference-project-stack[data-stack-mode="stack"] > .project-toolbar { position:sticky; top:var(--project-toolbar-top); }
 #project-grid.reference-project-stack[data-stack-mode="stack"] { --stack-sheet:var(--bg); }
-#project-grid.reference-project-stack > .project-stack-stage { position:relative; width:100%; min-width:0; padding-bottom:12px; }
-#project-grid.reference-project-stack[data-stack-mode="stack"] > .project-stack-stage { padding-bottom:clamp(80px,16vh,160px); }
+#project-grid.reference-project-stack > .project-stack-stage { position:relative; isolation:isolate; width:100%; min-width:0; padding-bottom:12px; }
+#project-grid.reference-project-stack[data-stack-mode="stack"] > .project-stack-stage {
+  display:flex; flex-direction:column; gap:24px; padding-bottom:0;
+}
+.content-stream #project-grid.reference-project-stack[data-stack-mode="stack"] .project-stack-stage > [data-project-domain] { margin-bottom:0; }
 .content-stream #project-grid.reference-project-stack [data-project-domain] {
   position:relative; z-index:var(--stack-layer,1); min-width:0; min-height:0;
   margin:0 0 24px; padding:clamp(26px,3.5vw,44px) !important;
@@ -3902,7 +3909,7 @@ body.side-quests-open .site-cursor { visibility:hidden !important; }
     <button type="button" id="reel-skip-btn" aria-label="Skip intro and explore the galaxy">SKIP INTRO <span aria-hidden="true">→</span></button>
 
 
-  <div class="intro-reel" id="intro-reel" aria-label="Opening film">
+  <div class="intro-reel is-typing" id="intro-reel" aria-label="Opening film">
     <nav class="reel-header" aria-label="Opening navigation"><a href="#intro-reel" data-replay>SUKRIT GHOSH</a><a href="#intro-reel" data-model>ABOUT ME</a><div class="reel-header-actions"><a href="#contact">CONTACT</a><button class="reel-theme-toggle" id="inner-theme-btn" type="button" role="switch" aria-checked="true" aria-label="Dark mode" title="Switch to light mode"><svg class="theme-contrast" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8" fill="none"/><path d="M12 4a8 8 0 0 0 0 16Z" fill="currentColor" stroke="none"/></svg></button></div></nav>
     <div class="reel-title" id="reel-title" data-type-complete="3331"><small>SUKRIT GHOSH / EXPLORING AI, DRIVEN BY LEARNING</small><strong role="heading" aria-level="1" aria-label="A story hidden in the data."><span aria-hidden="true"><i class="reel-typed-letter" data-type-at="180">A</i><i class="reel-typed-letter" data-type-at="285"> </i><i class="reel-typed-letter" data-type-at="390">s</i><i class="reel-typed-letter" data-type-at="495">t</i><i class="reel-typed-letter" data-type-at="600">o</i><i class="reel-typed-letter" data-type-at="705">r</i><i class="reel-typed-letter" data-type-at="810">y</i></span><span aria-hidden="true"><i class="reel-typed-letter" data-type-at="915">h</i><i class="reel-typed-letter" data-type-at="1020">i</i><i class="reel-typed-letter" data-type-at="1125">d</i><i class="reel-typed-letter" data-type-at="1230">d</i><i class="reel-typed-letter" data-type-at="1335">e</i><i class="reel-typed-letter" data-type-at="1440">n</i><i class="reel-typed-letter" data-type-at="1545"> </i><i class="reel-typed-letter" data-type-at="1650">i</i><i class="reel-typed-letter" data-type-at="1755">n</i></span><span aria-hidden="true"><i class="reel-typed-letter" data-type-at="1860">t</i><i class="reel-typed-letter" data-type-at="1965">h</i><i class="reel-typed-letter" data-type-at="2070">e</i><i class="reel-typed-letter" data-type-at="2175"> </i><em><i class="reel-typed-letter" data-type-at="2280">d</i><i class="reel-typed-letter" data-type-at="2385">a</i><i class="reel-typed-letter" data-type-at="2490">t</i><i class="reel-typed-letter" data-type-at="2595">a</i></em><b class="reel-ellipsis"><i class="reel-typed-letter" data-type-at="2910">.</i><i class="reel-typed-letter" data-type-at="3120">.</i><i class="reel-typed-letter" data-type-at="3330">.</i></b></span></strong></div>
     <div class="reel-seed" aria-hidden="true"></div>

@@ -3816,26 +3816,34 @@
       grid.classList.add('reference-project-stack');grid.dataset.projectsHeld='true';
       cards.forEach((card,i)=>{card.dataset.sequenceItem='true';card.classList.add('sequence-item','sequence-ready');card.style.setProperty('--stack-layer',String(i+1));});
       let frame=0,dirty=true,visible=cards,stickTops=[],stacked=false,animate=false,inView=true,top=110,lastMode='';
+      let toolbarTop=0,lastHeight=0;
       const notify=()=>window.dispatchEvent(new Event('project-story-layout'));
       function measure(){
         dirty=false;visible=cards.filter(card=>!card.hidden);
         const nav=document.querySelector('.nav-pill')?.getBoundingClientRect();
         const toolbar=grid.querySelector('.project-toolbar');
         const headerBottom=Math.max(72,nav?.bottom||72);
-        grid.style.setProperty('--project-toolbar-top',(headerBottom+12)+'px');
-        top=headerBottom+12+(toolbar?.offsetHeight||0)+16;
+        toolbarTop=headerBottom+12;
+        top=toolbarTop+(toolbar?.offsetHeight||0)+16;
         const available=innerHeight-top-32-Math.min(3,visible.length-1)*7;
         animate=!reduced.matches&&!forced.matches;
         stacked=animate&&wideViewport.matches&&visible.length>1&&available>240&&visible.every(card=>card.offsetHeight<=available);
         const mode=stacked?'stack':animate?'reveal':'flow';grid.dataset.stackMode=mode;
         stickTops=visible.map((card,i)=>top+Math.min(i,3)*7);
         visible.forEach((card,i)=>card.style.setProperty('--project-stick-top',stickTops[i]+'px'));
+        lastHeight=visible.at(-1)?.offsetHeight||0;
         if(mode!==lastMode){lastMode=mode;notify();}
       }
       function render(){
         frame=0;if(dirty)measure();
         if(!animate)return;
         const boxes=stacked?visible.map(card=>card.getBoundingClientRect()):[];
+        if(stacked){
+          // The final visible sheet and its toolbar leave the viewport together.
+          const lastNaturalTop=stage.getBoundingClientRect().bottom-lastHeight;
+          const release=Math.min(0,lastNaturalTop-stickTops.at(-1));
+          grid.style.setProperty('--project-toolbar-top',(toolbarTop+release)+'px');
+        }
         const stageTop=stacked?0:stage.getBoundingClientRect().top;
         const viewportHeight=innerHeight;
         const poses=visible.map((card,i)=>{
