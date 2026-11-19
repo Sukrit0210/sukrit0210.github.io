@@ -273,8 +273,6 @@
   const portfolioContent=document.getElementById('main-content');
   const introHeader=document.querySelector('.reel-header');
   const title = document.getElementById('reel-title');
-  const typedLetters=Array.from(title.querySelectorAll('[data-type-at]'));
-  let currentTypedLetter=null;
   const galaxyInterface=document.getElementById('galaxy-interface');
   const galaxyTrack=document.getElementById('scroll-track');
   model.inert=true;
@@ -1747,7 +1745,7 @@
     scrollIntent=0;lastScrollAt=0;touchScroll=null;cursorReady=false;
     resetGreetingInteraction();
     cinemaTime=attention=0;
-    currentTypedLetter?.classList.remove('is-current');
+    title.querySelector('.is-current')?.classList.remove('is-current');
     bridgeDots.forEach(dot=>dot.style.opacity='0');
     title.inert=true;title.setAttribute('aria-hidden','true');
     reel.classList.remove('phase-bridge');reel.classList.add('phase-model');model.inert=false;
@@ -1756,7 +1754,7 @@
   function enterBridge() {
     if(phase!=='title')return;
     ensureSceneSurfaces();
-    currentTypedLetter?.classList.remove('is-current');
+    title.querySelector('.is-current')?.classList.remove('is-current');
     const dotElements=title.querySelectorAll('.reel-ellipsis i');
     bridgeOrigins=Array.from(dotElements,element=> {
       const b=element.getBoundingClientRect();return {x:b.left+b.width/2,y:b.top+b.height/2};
@@ -1987,21 +1985,32 @@
   document.addEventListener('visibilitychange',requestFrame);
   document.addEventListener('keydown',event=>{if(event.key==='Escape'&&(phase==='question'||phase==='handoff'))finish();});
   header.inert=true;measure();
-  // Finish typing and the ellipsis before the short hold and continuous dot bridge.
+  // Continue from the opening title's clock, even if the main scripts arrived later.
   const typeComplete=Number(title.getAttribute('data-type-complete'))||3331;
   if(reduced)enterModel();else {
-    reel.classList.add('is-typing');
-    typedLetters.forEach(letter=>setTimeout(()=> {
+    if(!title.dataset.typingStarted){
+(() => {
+  const title = document.getElementById('reel-title');
+  if (title.dataset.typingStarted || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const reel = title.closest('.intro-reel');
+  title.dataset.typingStarted = String(performance.now());
+  let caret;
+  for (const letter of title.querySelectorAll('[data-type-at]')) {
+    setTimeout(() => {
+      if (reel.inert || title.inert) return;
       letter.classList.add('is-typed');
-      currentTypedLetter?.classList.remove('is-current');
-      currentTypedLetter=null;
-      if(phase==='title'&&letter.textContent!=='.') {
-        currentTypedLetter=letter;letter.classList.add('is-current');
-      }
-    },Number(letter.getAttribute('data-type-at'))||0));
+      caret?.classList.remove('is-current');
+      caret = letter.textContent === '.' ? null : letter;
+      caret?.classList.add('is-current');
+    }, Number(letter.dataset.typeAt));
+  }
+})();
+
+    }
+    const remaining=Number(title.dataset.typingStarted)+typeComplete-performance.now();
     // Generate the cached fog during the still reading beat, not during dot travel.
-    setTimeout(()=>{if(phase==='title')prepareAtmosphere(document.documentElement?.getAttribute('data-theme')==='dark');},typeComplete+120);
-    setTimeout(enterBridge,typeComplete+650);
+    setTimeout(()=>{if(phase==='title')prepareAtmosphere(document.documentElement?.getAttribute('data-theme')==='dark');},Math.max(0,remaining+120));
+    setTimeout(enterBridge,Math.max(0,remaining+650));
   }
 })();
 

@@ -3923,6 +3923,25 @@ body.side-quests-open .site-cursor { visibility:hidden !important; }
     <div class="reel-panel" id="reel-panel" aria-live="polite"><span class="question-accessible">Curious what that actually looks like?</span><strong aria-hidden="true"><span class="question-word question-curious">Curious</span><span class="question-word question-context">what that</span><span class="question-word question-actually">actually</span><span class="question-word question-ending">looks like?</span></strong></div>
   </div>
 
+  <script id="reel-typing">
+(() => {
+  const title = document.getElementById('reel-title');
+  if (title.dataset.typingStarted || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const reel = title.closest('.intro-reel');
+  title.dataset.typingStarted = String(performance.now());
+  let caret;
+  for (const letter of title.querySelectorAll('[data-type-at]')) {
+    setTimeout(() => {
+      if (reel.inert || title.inert) return;
+      letter.classList.add('is-typed');
+      caret?.classList.remove('is-current');
+      caret = letter.textContent === '.' ? null : letter;
+      caret?.classList.add('is-current');
+    }, Number(letter.dataset.typeAt));
+  }
+})();
+
+  </script>
   <div class="bg-grid"></div>
 
 
