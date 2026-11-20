@@ -66,7 +66,8 @@
     let html;
     try {
       if(documentSource.dataset.src){
-        const response=await fetch(documentSource.dataset.src);
+        const options=next==='blog'?{cache:'no-cache'}:undefined;
+        const response=await fetch(documentSource.dataset.src,options);
         if(!response.ok)throw Error(response.status);
         html=await response.text();
       }else{

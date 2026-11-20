@@ -3,7 +3,8 @@
   const status = container.querySelector('[role="status"]');
   const files = container.dataset.portfolioSections.split(' ');
   const readSection = async name => {
-    const response = await fetch('sections/' + name + '.html');
+    const options = name === 'projects' ? {cache: 'no-cache'} : undefined;
+    const response = await fetch('sections/' + name + '.html', options);
     if (!response.ok) throw Error('Could not load ' + name);
     return response.text();
   };
